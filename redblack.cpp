@@ -1,6 +1,3 @@
-// Arjun Vinsel
-// 11-APR-2024
-// this is a red black tree. This tree is an extension of a binary serach tree.
 
 #include <iostream>
 #include <string>
