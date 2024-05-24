@@ -1,7 +1,8 @@
 //Saikapish Sahu
 //5/23/24
-//Redblack Tree Deletion
-//Worked on code with Arjun V and Nikaansh S
+//RedBlack Tree
+//Worked on Code with Arjun V and Nikaansh S
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -10,7 +11,7 @@
 using namespace std;
 
 struct Node
-{//Thus is the node struct for the tree
+{ // Thus is the node struct for the tree
     int data;
     Node *parent;
     Node *left;
@@ -219,26 +220,26 @@ void print(Node *root, int level)
         cout << "\t";
     }
     if (root->parent != NULL)
-    {//if it has a parent
+    { // if it has a parent
         if (root->color == 1)
-        {//if the node is red
+        { // if the node is red
             cout << 'V' << root->data << " R "
                  << "P" << root->parent->data << endl;
         }
         else
-        {//if it is black
+        { // if it is black
             cout << 'V' << root->data << " B "
                  << "P" << root->parent->data << endl;
         }
     }
     else
-    {//if it does not have a parent
+    { // if it does not have a parent
         if (root->color == 1)
-        {//if it is red
+        { // if it is red
             cout << 'V' << root->data << " R " << endl;
         }
         else
-        {//if it is black
+        { // if it is black
             cout << 'V' << root->data << " B " << endl;
         }
     }
@@ -339,7 +340,7 @@ Node *findR(Node *root, int value)
 }
 
 void transplant(Node *u, Node *v, Node *&root)
-{//This funtion
+{ // This funtion
     if (u->parent == NULL)
     { // if root
         root = v;
@@ -359,7 +360,7 @@ void transplant(Node *u, Node *v, Node *&root)
 }
 
 void remove(Node *current, Node *&root)
-{//removes nodes rom the tree and calls the fixerD to fix the tree as per Red Black standards
+{ // removes nodes rom the tree and calls the fixerD to fix the tree as per Red Black standards
     int oc = current->color;
     Node *x;
     if (current->left == NULL)
@@ -381,7 +382,8 @@ void remove(Node *current, Node *&root)
         } // find minumuim
         oc = y->color;
         x = y->right;
-        if(x==NULL) {
+        if (x == NULL)
+        {
             x = new Node(NULL);
             x->parent = y;
         }
@@ -404,17 +406,36 @@ void remove(Node *current, Node *&root)
         y->left->parent = y;
         y->color = current->color;
     }
-    delete current;
-   if (oc == 0) { // if the node being deleted is black
-        fixerD(x, root);
-   }
+    if (oc == 0)
+    { // if the node being deleted is black
+        if (x != NULL)
+        {
+            fixerD(x, root);
+        }
+        if (x == NULL)
+        {
+            x = new Node(NULL);
+            x->parent = current->parent;
+            x->color = 0;
+
+            if (current->parent->left == current)
+            {
+                current->parent->left = x;
+            }
+            else if (current->parent->right == current)
+            {
+                current->parent->right = x;
+            }
+            fixerD(x, root);
+        }
+        delete current;
+    }
 }
 
 void fixerD(Node *current, Node *&root)
 { // fixes the tree when a node is removed as to follow redblack requirments
-//print(root, 0);
+    // print(root, 0);
     Node *s;
-    if( current!= NULL) {
     while (current != root && current->color == 0)
     {
         if (current->parent->left == current)
@@ -434,18 +455,17 @@ void fixerD(Node *current, Node *&root)
                 s->color = 1;
                 current = current->parent;
             }
-            if ((s == NULL || (s != NULL && s->color == 0)) &&
-                (s->left != NULL && (s->left->color == 1)) &&
-                (s->right == NULL || (s->right != NULL && s->right->color == 0)))
-            { // case 3
-                s->left->color = 0;
-                s->color = 1;
-                rRotate(s, root);
-                s = current->parent->right;
-            }
-            if ((s == NULL || (s != NULL && s->color == 0)) &&
-                (s->right != NULL && (s->right->color == 1)))
+            else
             {
+                if ((s == NULL || (s != NULL && s->color == 0)) &&
+                    (s->left != NULL && (s->left->color == 1)) &&
+                    (s->right == NULL || (s->right != NULL && s->right->color == 0)))
+                { // case 3
+                    s->left->color = 0;
+                    s->color = 1;
+                    rRotate(s, root);
+                    s = current->parent->right;
+                }
                 s->color = current->parent->color;
                 current->parent->color = 0;
                 lRotate(current->parent, root);
@@ -469,18 +489,17 @@ void fixerD(Node *current, Node *&root)
                 s->color = 1;
                 current = current->parent;
             }
-            if ((s == NULL || (s != NULL && s->color == 0)) &&
-                (s->left != NULL && (s->left->color == 1)) &&
-                (s->right == NULL || (s->right != NULL && s->right->color == 0)))
-            { // case 3
-                s->left->color = 0;
-                s->color = 1;
-                lRotate(s, root);
-                s = current->parent->right;
-            }
-            if ((s == NULL || (s != NULL && s->color == 0)) &&
-                (s->right != NULL && (s->right->color == 1)))
+            else
             {
+                if ((s == NULL || (s != NULL && s->color == 0)) &&
+                    (s->left != NULL && (s->left->color == 1)) &&
+                    (s->right == NULL || (s->right != NULL && s->right->color == 0)))
+                { // case 3
+                    s->left->color = 0;
+                    s->color = 1;
+                    lRotate(s, root);
+                    s = current->parent->right;
+                }
                 s->color = current->parent->color;
                 current->parent->color = 0;
                 rRotate(current->parent, root);
@@ -489,5 +508,4 @@ void fixerD(Node *current, Node *&root)
         }
     }
     current->color = 0;
-    }
 }
