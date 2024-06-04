@@ -349,7 +349,7 @@ void transplant(Node *u, Node *v, Node *&root)
     { // if left child
         u->parent->left = v;
     }
-    else
+    else if (u == u->parent->right)
     { // if right child
         u->parent->right = v;
     }
@@ -360,7 +360,7 @@ void transplant(Node *u, Node *v, Node *&root)
 }
 
 void remove(Node *current, Node *&root)
-{ // removes nodes rom the tree and calls the fixerD to fix the tree as per Red Black standards
+{ // removes nodes from the tree and calls the fixerD to fix the tree as per Red Black standards
     int oc = current->color;
     Node *x;
     if (current->left == NULL)
@@ -382,17 +382,18 @@ void remove(Node *current, Node *&root)
         } // find minumuim
         oc = y->color;
         x = y->right;
-        if (x == NULL)
-        {
-            x = new Node(NULL);
-            x->parent = y;
-        }
 
         if (y->parent == current)
         {
             if (x != NULL)
             {
                 x->parent = y;
+            }
+            if (x == NULL)
+            {
+                x = new Node(NULL);
+                x->parent = y;
+                x->color = 0;
             }
         }
         else
@@ -438,15 +439,15 @@ void fixerD(Node *current, Node *&root)
     Node *s;
     while (current != root && current->color == 0)
     {
-        if (current->parent->left == current)
-        {
+        if (current->parent->left == current || current->parent->left == NULL)
+        {//if current is a left child
             s = current->parent->right;
             if (s->color == 1)
             { // case 1
                 s->color = 0;
                 current->parent->color = 1;
                 lRotate(current->parent, root);
-                current = current->parent->right;
+                s = current->parent->right;
             }
             if ((s == NULL || (s != NULL && s->color == 0)) &&
                 (s->left == NULL || (s->left != NULL && s->left->color == 0)) &&
@@ -458,21 +459,28 @@ void fixerD(Node *current, Node *&root)
             else
             {
                 if ((s == NULL || (s != NULL && s->color == 0)) &&
-                    (s->left != NULL && (s->left->color == 1)) &&
+                    (s->left != NULL && (s->left != NULL && s->left->color == 1)) &&
                     (s->right == NULL || (s->right != NULL && s->right->color == 0)))
                 { // case 3
-                    s->left->color = 0;
+                    if (s->left != NULL)
+                    {
+                        s->left->color = 0;
+                    }
                     s->color = 1;
                     rRotate(s, root);
                     s = current->parent->right;
                 }
                 s->color = current->parent->color;
                 current->parent->color = 0;
+                if (s->right != NULL)
+                {
+                    s->right->color = 0;
+                }
                 lRotate(current->parent, root);
                 current = root;
             }
         }
-        else
+        else if(current->parent->right == current || current->parent->right == NULL)
         { // if s is the left child
             s = current->parent->left;
             if (s->color == 1)
@@ -480,11 +488,11 @@ void fixerD(Node *current, Node *&root)
                 s->color = 0;
                 current->parent->color = 1;
                 rRotate(current->parent, root);
-                current = current->parent->right;
+                s = current->parent->left;
             }
             if ((s == NULL || (s != NULL && s->color == 0)) &&
-                (s->left == NULL || (s->left != NULL && s->left->color == 0)) &&
-                (s->right == NULL || (s->right != NULL && s->right->color == 0)))
+                (s->right == NULL || (s->right != NULL && s->right->color == 0)) &&
+                (s->left == NULL || (s->left != NULL && s->left->color == 0)))
             { // case 2
                 s->color = 1;
                 current = current->parent;
@@ -492,20 +500,29 @@ void fixerD(Node *current, Node *&root)
             else
             {
                 if ((s == NULL || (s != NULL && s->color == 0)) &&
-                    (s->left != NULL && (s->left->color == 1)) &&
-                    (s->right == NULL || (s->right != NULL && s->right->color == 0)))
+                    (s->right != NULL && (s->right != NULL && s->right->color == 1)) &&
+                    (s->left == NULL || (s->left != NULL && s->left->color == 0)))
                 { // case 3
-                    s->left->color = 0;
+                    if (s->right != NULL)
+                    {
+                        s->right->color = 0;
+                    }
                     s->color = 1;
                     lRotate(s, root);
-                    s = current->parent->right;
+                    s = current->parent->left;
                 }
                 s->color = current->parent->color;
                 current->parent->color = 0;
+                if (s->left != NULL)
+                {
+                    s->left->color = 0;
+                }
                 rRotate(current->parent, root);
                 current = root;
             }
         }
     }
+    current->color = 0;
+}
     current->color = 0;
 }
